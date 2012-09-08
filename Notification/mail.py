@@ -15,13 +15,13 @@ class Mail():
     mail_pass = "autorun"
     mail_postfix = "163.com"
     
-    def SendMail(self, toList, title, content,fromAddress=None):
+    def SendMail(self, toList, title, content, fromAddress=None):
         '''
         toList:发给谁
         fromAddtress:来自于
         title:主题
         content:内容
-        send_mail("aaa@126.com","sub","content")
+        Mail().SendMail(["qianlf2008@163.com,test@test.com"], "title", "content"):
         '''
         me = "AutorunForScott<autorunforscott@163.com>"
         if fromAddress is None:
@@ -42,10 +42,8 @@ class Mail():
             print str(e)
             return False
  
-
-
 if __name__ == "__main__":
-    if Mail().SendMail("qianlf2008@163.com", "title", "content"):
+    if Mail().SendMail(["qianlf2008@163.com,test@test.com"], "title", "content"):
             print "发送成功"
     else:
             print "发送失败"	
