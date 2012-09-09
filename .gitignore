@@ -1,7 +1,5 @@
 *.pyc
-.settings/
-.project
-.pydevproject
-/.settings
+/.settings/
 /.project
 /.pydevproject
+*.jpg
