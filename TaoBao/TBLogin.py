@@ -1,12 +1,18 @@
 #coding=gbk
 
 from __future__ import unicode_literals
-import sys,re
+import sys,re,os
 import urllib,urllib2,cookielib
 
 class TBLogin():
     
-    def __init__(self,user,pwd):
+    user = None
+    pwd = None
+    
+    __verifyCode = re.compile('<img id="J_StandardCode_m" .*?src="(.*?)".*?>',re.S)
+    __commonError = re.compile('<div id="J_Message"  class="login-msg msg">.*<p class="error">(.*?)</div>',re.S)
+    
+    def __init__(self,user=None,pwd=None):
         #获取一个保存cookie的对象
         cj = cookielib.LWPCookieJar()
         #将一个保存cookie对象，和一个HTTP的cookie的处理器绑定
@@ -37,10 +43,11 @@ class TBLogin():
         """
         
         login_data = {
-                'ua':'',
+                #ua 据说是记录用户点击和输入信息的
+                'ua':'084tRPCEzNDcxNjgzNTAyMTY9U=|tRODwiImJyLV|tSPCtSJklidWZvaHIsITU8IidZbmRvZ3NyLV1Q==|tRODwiI3liLV|tTPCtYODwgPCEyNjM8JjY0PCEyODA8KDAwPCEyODA8JzYwPV1Q==|tYPCIiLV|tZPCIiLV|tRODwiLG9iLV|tRMTwrUihkdHBzej8vLG9naW5uJHFvYmFvbiNvbW8tZW1iZWJ/LG9naW5uKmhkfWxvMnVkaWJ1Y2R1UlxNOGR0cHUjMUUiNkUiNkd3d34kcW9iYW9uI29tZSI2QiwiKGR0cHo/LyxvZ2lubiRxb2Jhb24jb21vLWVtYmVifyxvZ29ldH4qaGR9bG8zcH1tMT4hMDAwMzg2PiA+Jj4pMjM3NDk2Jm00f2B2L2V0fTRydXVmInVkaWJ1Y2R1UlxNOGR0cHUjMUUiNkUiNkd3d34kcW9iYW9uI29tZSI2Qi1dU=|tRMjwiLG9naW5iLV|tRODwiKWRiLV|tRODwiJ2xjf2ItU=|tRMDwiK1Q1MzI5PCxSITM0NTk1MjMxNTkwMjxwPiE0Mzg2NzY0NDg4MTIzNjI3PFIsIT1SLV|tRMzwrUidZbmRvZ3NyLCInWU5AITE8IzwjMDA8IjcxMi1dU=|tRODwiLWByLV|tUPCtSIiwpNDQ8IjM3PCEwNDQwPV1Q==|tRODwiLWNiLV|tVPCtSIiwrUTA2NjwiNjY9XCA8IiIsITA3NTA9XV|tRODwiJmliLV|tXPCtSIiwhPCEwNzU2PV1Q==|tRODwiLWByLV|tUPCtSIiwhMDU0PCMwMTwhMjE5Nz1dU=|tRODwiLWNiLV|tVPCtSIiwrUTA1NDwjMDE9XCA8IiIsITIzMDQ9XV|tRODwiK2NyLV|tWPCtSIiwhMjM8IDwhMzA0MD1dU=|tRODwiLWNiLV|tVPCtSIiwrUTA1NDwjMDE9XCA8IiIsITQxNDE9XV|tRODwiJmliLV|tXPCtSIiwgPCIwMjE1PV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MTwiNTI9XCA8IiIsITA2OTMwPV1Q==|tRODwiJmliLV|tXPCtSIiwhPCEwNjk0Mj1dU=|tRODwiJmliLV|tXPCtSKk9TUWZlbE9naW5jSGVja2IsITwhMDY5NTQ9XV|tRODwiLWByLV|tUPCtSKk9TUWZlbE9naW5jSGVja2IsKDUwPCI1MzwhMDc2MDY9XV|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTY9XCA8IiIsITA4MjgyPV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTY9XCA8IiIsITA4OTEzPV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTY9XCA8IiIsITA5NjAwPV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTY9XCA8IiIsITEwNTU4PV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTY9XCA8IiIsITExMjA5PV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1NDwiNTE9XCA8IiIsITEyNjc0PV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTM9XCA8IiIsITE5MTk2PV1Q==|tRODwiLWNiLV|tVPCtSKk9TUWZlbE9naW5jSGVja2IsK1g1MDwiNTM9XCA8IiIsITIwOTk2PV1Q==|tRODwiJmliLV|tXPCtSKk9TUWZlbE9naW5jSGVja2IsIDwhMjQyODQ9XV|tRODwiJmliLV|tXPCtSIiwgPCEyNDMwMD1dU=',
                 'TPL_username':self.user.encode('gbk'),
                 'TPL_password':self.pwd,
-                'TPL_checkcode':'',
+                'TPL_checkcode':'http://www.taobao.com',
                 'need_check_code':'',
                 'longLogin':'1', #十天免登陆
                 'action':'Authenticator',
@@ -50,14 +57,14 @@ class TBLogin():
                 'fc':'default',
                 'style':'default',
                 'css_style':'',
-                'tid':'',
+                'tid':'XOR_1_000000000000000000000000000000_6358475540797D727877707E',
                 'support':'000001',
                 'CtrlVersion':'1,0,0,7',
                 'loginType':'3',
                 'minititle':'',
                 'minipara':'',
-                'umto':'',
-                'pstrong':'3',
+                'umto':'Te2cf41fa2b993f1082c87e7decec3f65',
+                'pstrong':'2',
 #                'longLogin':'-1',
                 'llnick':'',
                 'sign':'',
@@ -70,24 +77,44 @@ class TBLogin():
                 'not_duplite_str':'',
                 'need_user_id':'',
                 'poy':'',
-                'gvfdcname':'',
-                'gvfdcre':'',
+                'gvfdcname':'10',
+                'gvfdcre':'', #可以没有
                 'from_encoding':''
                 }
         return login_data
     
-    def login(self):
+    def login(self,postData = None):
         
+        if postData is None:
+            postData = self.getLoginData() 
+            
         url = 'https://login.taobao.com/member/login.jhtml'        
-        source = self.request(url,self.getLoginData())
+        source = self.request(url,postData)
         if source:
             print source
-            print self.checkLoginError(source)
+            error = self.checkLoginError(source)
+            print error
+            if error:
+                if error.find('为了您的账号安全，请输入验证码。') != -1 \
+                or error.find('验证码错误，请重新输入。') != -1:
+                    r = self.__verifyCode.search(source)
+                    if r:
+                        s = self.request(r.group(1))
+                        f = open("verifyCode.jpg","wb")
+                        f.write(s)
+                        f.close()
+                        os.system('verifyCode.jpg')
+                        postData['need_check_code'] = 'true'
+                        postData['TPL_checkcode'] = raw_input("please input verifycode:")
+                        self.login(postData)
+                
+                if error.find('您输入的密码和账户名不匹配，请重新输入') != -1:
+                    print '您输入的密码和账户名不匹配，请重新输入'
+                    return
+                        
                  
-    def checkLoginError(self,source):
-        
-        needVerifyCodeError = re.compile('<div id="J_Message"  class="login-msg msg">.*<p class="error">(.*?)</div>',re.S)
-        r = needVerifyCodeError.search(source)
+    def checkLoginError(self,source):      
+        r = self.__commonError.search(source)
         return r.group(1) if r else None
                  
     def request(self,url,postData=dict()):
@@ -104,11 +131,15 @@ class TBLogin():
             request = urllib2.urlopen(req)
             source = request.read()
             # print request.code,request.msg
-            request.close()
+#            request.close()
             return source
         except:
             info=sys.exc_info()  
-            print info[0],":",info[1] 
+            print info[0],":",info[1]
             return None
 
 if __name__ == '__main__':
+    t = TBLogin()
+    t.user = 'autorunforscott'
+    t.pwd = ''
+    t.login()
