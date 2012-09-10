@@ -21,7 +21,7 @@ class TBLogin():
         opener = urllib2.build_opener(cookie_support, urllib2.HTTPHandler)
         #将包含了cookie、http处理器、http的handler的资源和urllib2对象板顶在一起
         urllib2.install_opener(opener)
-        
+
         self.user,self.pwd = user,pwd
         
     def getHeaders(self):
@@ -65,7 +65,6 @@ class TBLogin():
                 'minipara':'',
                 'umto':'Te2cf41fa2b993f1082c87e7decec3f65',
                 'pstrong':'2',
-#                'longLogin':'-1',
                 'llnick':'',
                 'sign':'',
                 'need_sign':'',
@@ -83,23 +82,26 @@ class TBLogin():
                 }
         return login_data
     
+    def checkLoginSucceed(self):
+        s = self.request('http://i.taobao.com')
+        print s
+    
     def login(self,postData = None):
         
         if postData is None:
             postData = self.getLoginData() 
             
-        url = 'https://login.taobao.com/member/login.jhtml'        
+        url = 'http://login.taobao.com/member/login.jhtml?spm=1.1000386.0.2.61c0ef&f=top&redirectURL=http://trade.taobao.com/trade/itemlist/list_bought_items.htm'        
         source = self.request(url,postData)
         if source:
-            print source
             error = self.checkLoginError(source)
-            print error
             if error:
+                print error
                 if error.find('为了您的账号安全，请输入验证码。') != -1 \
                 or error.find('验证码错误，请重新输入。') != -1:
                     r = self.__verifyCode.search(source)
                     if r:
-                        s = self.request(r.group(1))
+                        s = self.request(r.group(1).replace('https:','http:'))
                         f = open("verifyCode.jpg","wb")
                         f.write(s)
                         f.close()
@@ -111,6 +113,9 @@ class TBLogin():
                 if error.find('您输入的密码和账户名不匹配，请重新输入') != -1:
                     print '您输入的密码和账户名不匹配，请重新输入'
                     return
+            else:
+#                self.checkLoginSucceed()
+                print self.request('http://taojinbi.taobao.com/record/coin_get.htm?spm=a1z01.1000834.0.78.9510b9&tracelog=qzindex005')
                         
                  
     def checkLoginError(self,source):      
@@ -140,6 +145,6 @@ class TBLogin():
 
 if __name__ == '__main__':
     t = TBLogin()
-    t.user = 'autorunforscott'
-    t.pwd = ''
+    t.user = 'autorunforscott@163.com'
+    t.pwd = 'autorun123456'
     t.login()
