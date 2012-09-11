@@ -5,6 +5,9 @@ import sys,re,os
 import urllib,urllib2,cookielib
 
 class TBLogin():
+    """
+        自动登录淘宝
+    """
     
     user = None
     pwd = None
@@ -82,12 +85,15 @@ class TBLogin():
                 }
         return login_data
     
-    def checkLoginSucceed(self):
-        s = self.request('http://i.taobao.com')
-        print s
+    def checkLoginSucceed(self,source):
+        return source.find('<div class="mt-edit-userinfo">') != -1
     
     def login(self,postData = None):
+        """
+        postData: 需要提交的数据
         
+        True 登录成功，否则失败。
+        """
         if postData is None:
             postData = self.getLoginData() 
             
@@ -97,6 +103,7 @@ class TBLogin():
             error = self.checkLoginError(source)
             if error:
                 print error
+                
                 if error.find('为了您的账号安全，请输入验证码。') != -1 \
                 or error.find('验证码错误，请重新输入。') != -1:
                     r = self.__verifyCode.search(source)
@@ -108,16 +115,22 @@ class TBLogin():
                         os.system('verifyCode.jpg')
                         postData['need_check_code'] = 'true'
                         postData['TPL_checkcode'] = raw_input("please input verifycode:")
-                        self.login(postData)
+                        return self.login(postData)
                 
-                if error.find('您输入的密码和账户名不匹配，请重新输入') != -1:
+                elif error.find('您输入的密码和账户名不匹配，请重新输入') != -1:
                     print '您输入的密码和账户名不匹配，请重新输入'
-                    return
+                    return False
+                
+                else:
+                    return False
+                
             else:
-#                self.checkLoginSucceed()
-                print self.request('http://taojinbi.taobao.com/record/coin_get.htm?spm=a1z01.1000834.0.78.9510b9&tracelog=qzindex005')
-                        
-                 
+                if self.checkLoginSucceed(source):
+                    return True
+                else:
+                    print '登录没有错误，但是登录不成功'
+                    return False
+                                     
     def checkLoginError(self,source):      
         r = self.__commonError.search(source)
         return r.group(1) if r else None
@@ -143,8 +156,3 @@ class TBLogin():
             print info[0],":",info[1]
             return None
 
-if __name__ == '__main__':
-    t = TBLogin()
-    t.user = 'autorunforscott@163.com'
-    t.pwd = 'autorun123456'
-    t.login()
