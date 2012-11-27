@@ -4,6 +4,7 @@ import os,sys,subprocess,stat
 import xml.dom.minidom
 import codecs
 from colorama import Fore, Back, Style,init
+import time
 
 #init colorama
 init()
@@ -67,9 +68,27 @@ class Prodika(object):
         '''开启Remoting Container'''
 
         rPath = os.path.join(self.prodikaPath,r'Code\Apps\RemotingContainer\bin\RemotingContainer.exe -normal')
-        GreenPrint('正在启动...')
+        GreenPrint('正在启动 Remoting Container...')
         #subprocess.Popen(args=rPath, shell=False)
         os.system(rPath)
+
+    def C_LoadProdikaEnvironment(self):
+        '''LoadEnv for prodika'''
+        GreenPrint('正在加载环境变量...')
+        os.system(r'start cmd /k "echo off & echo loading env,please wait... & cd ' + self.prodikaPath + ' & loadEnv.bat"')
+        GreenPrint('Done!')
+        exit()
+
+    #def D_UpdateProdikaAndAppPlatform(self):
+        #'''从服务器更新AppPlatform和Prodika项目'''
+        #timeStr = time.strftime('%Y%m%d',time.localtime(time.time()))
+        #changeListForApp = 'changelistForApp_'+ timeStr
+        #p = subprocess.Popen('p4 integrate -b v611-_appplatform -c '+changeListForApp,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        #o = str(p.stdout.read())
+        #if o.strip() == 'All revision(s) already integrated.':
+            #GreenPrint('AppPlatform不需要更新...')
+        #else:
+            #GreenPrint(o)
 
 p = Prodika()
 methods = [i for i in dir(p) if not i.startswith('_') and i[0].isupper()]
@@ -77,7 +96,7 @@ print '========================================================='
 print '\n请选择需要进行的操作：（按Q退出）\n'
 for i in range(len(methods)):
     m = methods[i]
-    print str(i) + '. ' + getattr(p,m).__doc__
+    print str(i+1) + '. ' + getattr(p,m).__doc__
 print '\n========================================================='
 
 selected = ''
@@ -85,5 +104,5 @@ while(selected != 'q'):
     YellowPrint('\n请选择序号：')
     selected = raw_input()
     for i in range(len(methods)):
-        if selected == str(i):
+        if selected == str(i+1):
             getattr(p,methods[i])()
