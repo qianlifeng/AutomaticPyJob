@@ -7,9 +7,8 @@ import re
 
 class TBCoin(object):
     '''
-         淘金币模块
-    
-        使用之前，请确保已经使用TBLogin.py进行登录
+    淘金币模块
+    使用之前，请确保已经使用TBLogin.py进行登录
     '''
     
     tb = TBLogin()
@@ -17,9 +16,8 @@ class TBCoin(object):
     
     def getCurrentTBCoin(self):
         """
-                  获得当前登录用户的淘金币数量
-                 
-                  返回值：成功则返回金币数量，失败则返回None
+        获得当前登录用户的淘金币数量
+        返回值：成功则返回金币数量，失败则返回None
         """
         
         r = re.compile('<strong id="J_Coin">(.*?)</strong>', re.S)
@@ -31,6 +29,6 @@ class TBCoin(object):
         return int(coin) if coin else None
         
 if __name__ == '__main__':
-    t = TBLogin('','')
+    t = TBLogin('autorunforscott@163.com','autorun123456')
     if t.login():
         print TBCoin().getCurrentTBCoin()
