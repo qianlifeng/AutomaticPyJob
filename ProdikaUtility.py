@@ -28,6 +28,7 @@ class Prodika(object):
     #方法前面的A_前缀是为了方法自省排序的时候使用
 
     prodikaPath = r'd:\WorkProject\private\lqian\v6.1.1.0_20120724\Prodika'
+    prodikaPath6103 = r'd:\WorkProject\private\lqian\v6.1.0.3\Prodika'
     
 
     def _ChangeCoreAppSettingValue(self,v):
@@ -65,9 +66,17 @@ class Prodika(object):
         self._ChangeCoreAppSettingValue(v)
 
     def B_StartRemotingContainer(self):
-        '''开启Remoting Container'''
+        '''开启 611 Remoting Container'''
 
         rPath = os.path.join(self.prodikaPath,r'Code\Apps\RemotingContainer\bin\RemotingContainer.exe -normal')
+        GreenPrint('正在启动 Remoting Container...')
+        #subprocess.Popen(args=rPath, shell=False)
+        os.system(rPath)
+
+    def B_StartRemotingContainer6103(self):
+        '''开启 6103 Remoting Container'''
+
+        rPath = os.path.join(self.prodikaPath6103,r'Code\Apps\RemotingContainer\bin\RemotingContainer.exe -normal')
         GreenPrint('正在启动 Remoting Container...')
         #subprocess.Popen(args=rPath, shell=False)
         os.system(rPath)
